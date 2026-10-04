@@ -78,6 +78,33 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdro
 .nav-cta{display:flex;gap:12px;align-items:center}
 .nav-cta .btn{padding:10px 18px;font-size:.9rem}
 
+/* burger menu (mobile) */
+.burger{
+  display:none;width:42px;height:42px;padding:0;margin-left:16px;
+  background:#fff;border:1px solid var(--line);border-radius:10px;cursor:pointer;
+  place-items:center;
+}
+.burger span{display:block;width:18px;height:2px;background:var(--ink);position:relative;border-radius:2px}
+.burger span::before,.burger span::after{
+  content:'';position:absolute;left:0;width:18px;height:2px;background:var(--ink);border-radius:2px;
+}
+.burger span::before{top:-6px}
+.burger span::after{top:6px}
+.nav-links.open{
+  display:flex;position:absolute;top:70px;left:0;right:0;
+  flex-direction:column;gap:0;background:#fff;
+  border-bottom:1px solid var(--line);padding:6px 24px 14px;margin:0;
+  box-shadow:0 20px 30px -22px rgba(15,23,42,.35);
+}
+.nav-links.open li a{display:block;padding:13px 0;border-bottom:1px solid var(--line);font-size:1rem}
+.nav-links.open li:last-child a{border-bottom:0}
+.nav{position:relative}
+
+/* focus visibility */
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:3px solid var(--indigo);outline-offset:3px;border-radius:6px;
+}
+
 /* ---------- hero ---------- */
 .hero{padding:88px 0 96px;background:linear-gradient(180deg,var(--indigo-light) 0%,#fff 100%)}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
@@ -197,6 +224,8 @@ details p{margin:0;padding:0 40px 24px 0;font-size:.95rem}
 .signup .btn{background:#fff;color:var(--indigo-dark)}
 .signup .btn:hover{background:#eef2ff}
 .final .fine{font-size:.8rem;color:#c7d2fe;margin:0}
+.form-note{min-height:20px;font-size:.85rem;font-weight:600;margin:0 0 8px;color:#fff}
+.form-note.err{color:#fecaca}
 
 /* ---------- footer ---------- */
 footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
@@ -213,13 +242,22 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
   .grid-3,.tiers,.steps,.grid-3.tst{grid-template-columns:1fr}
   .step:not(:last-child)::after{display:none}
   .nav-links{display:none}
+  .nav-cta .btn-ghost{display:none}
+  .burger{display:grid}
   .signup{flex-direction:column}
   .logos .logo-row{gap:24px}
+  .tier.hot{order:-1}
 }
 @media(max-width:560px){
   section{padding:72px 0}
   .shot-body{grid-template-columns:1fr}
   .side{display:none}
+  .cols{grid-template-columns:1fr}
+  .hero-actions .btn{width:100%}
+  .signup .btn{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 </style>
 </head>
@@ -228,7 +266,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
 <header>
   <div class="wrap nav">
     <a class="brand" href="#top"><span class="brand-mark">✓</span> TaskFlow</a>
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How it works</a></li>
       <li><a href="#pricing">Pricing</a></li>
@@ -238,6 +276,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
       <a class="btn btn-ghost" href="#">Sign in</a>
       <a class="btn btn-primary" href="#final">Start free</a>
     </div>
+    <button class="burger" id="burger" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks"><span></span></button>
   </div>
 </header>
 
@@ -519,10 +558,11 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
     <div class="wrap">
       <h2>Ready to transform your workflow?</h2>
       <p>Join 10,000+ teams that ship on time with TaskFlow. Free for 14 days, no credit card required.</p>
-      <form class="signup" onsubmit="event.preventDefault();this.querySelector('button').textContent='Check your inbox ✓';">
-        <input type="email" required placeholder="you@company.com" aria-label="Email address">
+      <form class="signup" id="signupForm" novalidate>
+        <input type="email" id="email" name="email" required placeholder="you@company.com" aria-label="Email address" autocomplete="email">
         <button class="btn btn-lg" type="submit">Get Started Free</button>
       </form>
+      <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
       <p class="fine">By signing up you agree to our Terms and Privacy Policy.</p>
     </div>
   </section>
@@ -542,6 +582,91 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
     <div class="copyright">© 2026 TaskFlow Inc. All rights reserved.</div>
   </div>
 </footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---- Mobile navigation ---- */
+  var burger = document.getElementById('burger');
+  var links = document.getElementById('navLinks');
+
+  function setMenu(open) {
+    links.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+  }
+
+  burger.addEventListener('click', function () {
+    setMenu(!links.classList.contains('open'));
+  });
+
+  links.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setMenu(false);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && links.classList.contains('open')) {
+      setMenu(false);
+      burger.focus();
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (links.classList.contains('open') && !e.target.closest('header')) setMenu(false);
+  });
+
+  // Reset menu when returning to desktop width
+  var mq = window.matchMedia('(min-width: 981px)');
+  (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(function (e) {
+    if (e.matches) setMenu(false);
+  });
+
+  /* ---- FAQ: keep only one panel open ---- */
+  var faqs = Array.prototype.slice.call(document.querySelectorAll('#faq details'));
+  faqs.forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (!d.open) return;
+      faqs.forEach(function (other) { if (other !== d) other.open = false; });
+    });
+  });
+
+  /* ---- Email capture (front-end demo: no backend call) ---- */
+  var form = document.getElementById('signupForm');
+  var input = document.getElementById('email');
+  var note = document.getElementById('formNote');
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var value = input.value.trim();
+
+    if (!value) {
+      note.textContent = 'Please enter your email address.';
+      note.classList.add('err');
+      input.focus();
+      return;
+    }
+    if (!EMAIL.test(value)) {
+      note.textContent = 'That email doesn’t look valid. Check for typos.';
+      note.classList.add('err');
+      input.focus();
+      return;
+    }
+
+    note.classList.remove('err');
+    note.textContent = 'Thanks! We sent your invite to ' + value + '.';
+    form.querySelector('button').textContent = 'Invite sent ✓';
+    form.reset();
+  });
+
+  input.addEventListener('input', function () {
+    if (!note.classList.contains('err')) return;
+    note.textContent = '';
+    form.querySelector('button').textContent = 'Get Started Free';
+  });
+})();
+</script>
 
 </body>
 </html>
