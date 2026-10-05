@@ -67,6 +67,21 @@ section{padding:96px 0}
 .link-arrow::after{content:'→';transition:.18s}
 .link-arrow:hover::after{transform:translateX(4px)}
 
+/* visually hidden / honeypot */
+.visually-hidden{
+  position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+
+/* ---------- skip link ---------- */
+.skip-link{
+  position:absolute;left:16px;top:-60px;z-index:100;
+  background:var(--ink);color:#fff;font-weight:600;font-size:.9rem;
+  padding:12px 20px;border-radius:0 0 10px 10px;transition:top .18s ease;
+}
+.skip-link:focus{top:0;color:#fff}
+
 /* ---------- nav ---------- */
 header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
@@ -263,15 +278,17 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
 </head>
 <body>
 
-<header>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header role="banner">
   <div class="wrap nav">
-    <a class="brand" href="#top"><span class="brand-mark">✓</span> TaskFlow</a>
-    <ul class="nav-links" id="navLinks">
+    <a class="brand" href="#main"><span class="brand-mark">✓</span> TaskFlow</a>
+    <nav aria-label="Main"><ul class="nav-links" id="navLinks">
       <li><a href="#features">Features</a></li>
       <li><a href="#how">How it works</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
-    </ul>
+    </ul></nav>
     <div class="nav-cta">
       <a class="btn btn-ghost" href="#">Sign in</a>
       <a class="btn btn-primary" href="#final">Start free</a>
@@ -280,7 +297,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
   </div>
 </header>
 
-<main id="top">
+<main id="main" tabindex="-1">
 
   <!-- 1. HERO -->
   <section class="hero">
@@ -368,7 +385,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
       <div class="grid-3">
         <article class="card-f">
           <div class="icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
           </div>
           <h3>Task Management</h3>
           <p>Kanban boards, list views and calendars — switch between them without losing your place. Every task has an owner, a due date and a clear next step.</p>
@@ -377,7 +394,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
 
         <article class="card-f">
           <div class="icon">
-            <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.85"/><path d="M16 3.15a4 4 0 0 1 0 7.7"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.85"/><path d="M16 3.15a4 4 0 0 1 0 7.7"/></svg>
           </div>
           <h3>Team Collaboration</h3>
           <p>Real-time editing with live cursors, threaded comments and @mentions. Discuss the work right where it happens instead of losing it in chat.</p>
@@ -386,7 +403,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
 
         <article class="card-f">
           <div class="icon">
-            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l3.5-4 3 2.5L20 7"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l3.5-4 3 2.5L20 7"/></svg>
           </div>
           <h3>Analytics Dashboard</h3>
           <p>Progress tracking and team performance in real time. Spot bottlenecks early, celebrate wins on time and report status in one click.</p>
@@ -436,13 +453,13 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
           <div class="price">$0<small>/month</small></div>
           <p class="tier-desc">For individuals and personal projects.</p>
           <ul>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Up to 5 projects</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited tasks</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Kanban &amp; list views</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>1 GB file storage</li>
-            <li class="off"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Real-time collaboration</li>
-            <li class="off"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Analytics dashboard</li>
-            <li class="off"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Priority support</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Up to 5 projects</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited tasks</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Kanban &amp; list views</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>1 GB file storage</li>
+            <li class="off"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Real-time collaboration</li>
+            <li class="off"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Analytics dashboard</li>
+            <li class="off"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>Priority support</li>
           </ul>
           <a class="btn btn-ghost" href="#final">Get started free</a>
         </div>
@@ -453,13 +470,13 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
           <div class="price">$12<small>/user/month</small></div>
           <p class="tier-desc">For small teams shipping real work.</p>
           <ul>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited projects</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Real-time editing &amp; comments</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>@mentions &amp; assignments</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Analytics dashboard</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Calendar &amp; timeline views</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>100 GB file storage</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Priority support</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited projects</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Real-time editing &amp; comments</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>@mentions &amp; assignments</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Analytics dashboard</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Calendar &amp; timeline views</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>100 GB file storage</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Priority support</li>
           </ul>
           <a class="btn btn-primary" href="#final">Start 14-day trial</a>
         </div>
@@ -469,13 +486,13 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
           <div class="price">Custom</div>
           <p class="tier-desc">For large organizations with complex needs.</p>
           <ul>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Everything in Pro</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>SAML SSO &amp; SCIM</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Advanced permissions</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited storage</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Audit log &amp; data export</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>99.9% uptime SLA</li>
-            <li><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Dedicated success manager</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Everything in Pro</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>SAML SSO &amp; SCIM</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Advanced permissions</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Unlimited storage</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Audit log &amp; data export</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>99.9% uptime SLA</li>
+            <li><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Dedicated success manager</li>
           </ul>
           <a class="btn btn-ghost" href="#final">Contact sales</a>
         </div>
@@ -558,8 +575,13 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
     <div class="wrap">
       <h2>Ready to transform your workflow?</h2>
       <p>Join 10,000+ teams that ship on time with TaskFlow. Free for 14 days, no credit card required.</p>
-      <form class="signup" id="signupForm" novalidate>
-        <input type="email" id="email" name="email" required placeholder="you@company.com" aria-label="Email address" autocomplete="email">
+      <form class="signup" id="signupForm" action="/api/leads" method="post" novalidate>
+        <label class="visually-hidden" for="email">Email address</label>
+        <input type="email" id="email" name="email" required placeholder="you@company.com" autocomplete="email">
+        <div class="hp" aria-hidden="true">
+          <label for="company">Company</label>
+          <input type="text" id="company" name="company" tabindex="-1" autocomplete="off">
+        </div>
         <button class="btn btn-lg" type="submit">Get Started Free</button>
       </form>
       <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
@@ -569,7 +591,7 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
 
 </main>
 
-<footer>
+<footer role="contentinfo">
   <div class="wrap foot">
     <div class="brand"><span class="brand-mark">✓</span> TaskFlow</div>
     <div class="foot-links">
@@ -631,40 +653,76 @@ footer{padding:44px 0;background:var(--ink);color:#94a3b8;font-size:.9rem}
     });
   });
 
-  /* ---- Email capture (front-end demo: no backend call) ---- */
+  /* ---- Email capture -> POST /api/leads (same origin, Flask) ---- */
   var form = document.getElementById('signupForm');
   var input = document.getElementById('email');
   var note = document.getElementById('formNote');
+  var button = form.querySelector('button');
+  var LABEL = button.textContent;
   var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  // UTM capture so the API can attribute the lead (see backend/store.py queue_stats)
+  function utm() {
+    var q = new URLSearchParams(window.location.search), out = {};
+    ['source', 'medium', 'campaign'].forEach(function (k) {
+      var v = q.get('utm_' + k) || q.get(k);
+      if (v) out[k] = v.slice(0, 120);
+    });
+    return out;
+  }
+
+  function say(msg, isError) {
+    note.textContent = msg;
+    note.classList.toggle('err', !!isError);
+  }
+
+  function setBusy(busy, text) {
+    button.disabled = busy;
+    button.textContent = text;
+    button.setAttribute('aria-busy', String(busy));
+    input.setAttribute('aria-invalid', String(!!(busy && false)));
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var value = input.value.trim();
 
-    if (!value) {
-      note.textContent = 'Please enter your email address.';
-      note.classList.add('err');
-      input.focus();
-      return;
-    }
-    if (!EMAIL.test(value)) {
-      note.textContent = 'That email doesn’t look valid. Check for typos.';
-      note.classList.add('err');
-      input.focus();
-      return;
-    }
+    if (!value) { say('Please enter your email address.', true); input.focus(); return; }
+    if (!EMAIL.test(value)) { say('That email doesn\u2019t look valid. Check for typos.', true); input.focus(); return; }
 
-    note.classList.remove('err');
-    note.textContent = 'Thanks! We sent your invite to ' + value + '.';
-    form.querySelector('button').textContent = 'Invite sent ✓';
-    form.reset();
+    // Honeypot: silently "succeed" for bots, never hit the API.
+    var hp = document.getElementById('company');
+    if (hp && hp.value) { say('Thanks! Check your inbox.', false); button.textContent = 'Invite sent \u2713'; form.reset(); return; }
+
+    setBusy(true, 'Sending\u2026');
+    fetch(form.getAttribute('action'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: value, utm: utm() })
+    }).then(function (res) {
+      if (res.status === 429) { say('Too many attempts from this device. Try again in an hour.', true); return; }
+      if (res.status === 400) { say('That email doesn\u2019t look valid. Check for typos.', true); return; }
+      if (!res.ok && res.status !== 200 && res.status !== 201) throw new Error('http ' + res.status);
+      return res.json().catch(function () { return {}; });
+    }).then(function (data) {
+      if (!data) return;
+      setBusy(false, 'Invite sent \u2713');
+      say(data.duplicate
+        ? 'You\u2019re already on the list \u2014 we\u2019ll be in touch soon.'
+        : 'Thanks! Your invite is on its way to ' + value + '.', false);
+      form.reset();
+    }).catch(function () {
+      setBusy(false, LABEL);
+      say('We couldn\u2019t reach the server. Please try again in a moment.', true);
+    });
   });
 
   input.addEventListener('input', function () {
     if (!note.classList.contains('err')) return;
     note.textContent = '';
-    form.querySelector('button').textContent = 'Get Started Free';
+    if (button.disabled === false) button.textContent = LABEL;
   });
+
 })();
 </script>
 
