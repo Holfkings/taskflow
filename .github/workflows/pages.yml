@@ -26,10 +26,21 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # La landing es un unico index.html estatico (sin build step). Armamos un
+      # directorio de artifact con SOLO lo publicable, en vez de subir el repo
+      # entero con path: '.' — asi backend/, render.yaml y los tests no quedan
+      # servidos en holfkings.github.io/taskflow/... (hoy 404, pero Published en
+      # cuanto backend/ entra al repo).
+      - name: Assemble artifact (solo index.html)
+        run: |
+          mkdir -p _site
+          cp index.html .nojekyll _site/
+          echo "--- artifact ---" && ls -la _site
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
