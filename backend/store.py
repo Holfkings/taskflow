@@ -28,7 +28,10 @@ def connect():
     cx.execute("PRAGMA foreign_keys = ON")
     try:
         yield cx
-        cx.execute("PRAGMA optimize")
+        try:
+            cx.execute("PRAGMA optimize")
+        except sqlite3.OperationalError:  # p.ej. BD en solo lectura
+            pass
     finally:
         cx.close()
 
@@ -36,6 +39,27 @@ def connect():
 def init_db():
     with connect() as cx:
         cx.executescript(SCHEMA)
+
+
+@contextmanager
+def transaction(cx):
+    """Transaccion REAL: BEGIN IMMEDIATE ... COMMIT / ROLLBACK explicitos.
+
+    La conexion va con isolation_level=None (autocommit), que es lo que
+    quiere executescript() y PRAGMA. El efecto: `with cx:` NO hace
+    rollback de nada en ese modo -- se limita a commit() al salir y se
+    traga la excepcion. Con eso, un INSERT de leads que fallaba mas
+    abajo (p.ej. FK en lead_events) dejaba el lead y su evento 'created'
+    ya persistidos a medias. Verificado en sqlite 3.53.1.
+    """
+    cx.execute("BEGIN IMMEDIATE")
+    try:
+        yield cx
+    except Exception:
+        cx.execute("ROLLBACK")
+        raise
+    else:
+        cx.execute("COMMIT")
 
 
 def hash_ip(ip: str) -> str:
@@ -83,7 +107,7 @@ def upsert_lead(cx, email: str, source="landing_cta", ip_hash=None, user_agent=N
     utm = utm or {}
     key = email_key(email)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    with cx:  # transacción
+    with transaction(cx):  # transaccion real: si algo falla, no queda lead a medias
         if honeypot:
             block_ip(cx, ip_hash, "honeypot")
         existing = cx.execute("SELECT id FROM leads WHERE email_key=?", (key,)).fetchone()

@@ -1,5 +1,6 @@
 """Verificación real del store: corre con `python backend/test_store.py`."""
 import os
+import sqlite3
 import sys
 import tempfile
 
@@ -67,4 +68,52 @@ print("7 ok  validación -> acepta válidos, rechaza malformados y >254 chars")
 # 8) stats y migración idempotente
 store.init_db()
 print("8 ok  init_db() dos veces ->", store.queue_stats())
+
+
+# 9) la 'transacción' de upsert_lead TIENE que ser real.
+#    store.connect() usa isolation_level=None (autocommit), y ahí `with cx:`
+#    NO hace rollback: solo commit() al salir y se traga la excepción. Con eso,
+#    si algo fallaba después del INSERT de leads (una FK en lead_events, p.ej.),
+#    el lead y su evento 'created' quedaban persistidos a medias y el endpoint
+#    devolvía 500 con basura en la tabla. Verificado contra sqlite 3.53.1.
+class _Saboteur:
+    """Falla justo en el INSERT de lead_events, dentro de la transacción."""
+
+    def __init__(self, cx):
+        self._cx = cx
+
+    def execute(self, sql, *args):
+        if "INSERT INTO lead_events" in sql:
+            raise sqlite3.IntegrityError("FOREIGN KEY constraint failed (simulado)")
+        return self._cx.execute(sql, *args)
+
+
+def _counts():
+    with store.connect() as cx:
+        return (cx.execute("SELECT COUNT(*) c FROM leads").fetchone()["c"],
+                cx.execute("SELECT COUNT(*) c FROM lead_events").fetchone()["c"])
+
+
+antes = _counts()
+try:
+    with store.connect() as cx:
+        store.upsert_lead(_Saboteur(cx), "caja@medialuna.co", ip_hash="hash-simulado")
+    raise AssertionError("debería haber propagado la IntegrityError")
+except sqlite3.IntegrityError:
+    pass
+assert _counts() == antes, f"quedó un lead a medias: {_counts()} != {antes}"
+print("9 ok  transacción real -> un fallo a mitad no deja leads ni eventos a medias")
+
+# 9b) tampoco debe quedar la IP bloqueada a medias si el fallo cae dentro de la tx
+try:
+    with store.connect() as cx:
+        store.upsert_lead(_Saboteur(cx), "bot2@spam.example", ip_hash="hash-bot", honeypot=True)
+    raise AssertionError("debería haber propagado la IntegrityError")
+except sqlite3.IntegrityError:
+    pass
+with store.connect() as cx:
+    assert not store.is_blocked(cx, "hash-bot"), "la IP quedó bloqueada a medias"
+assert _counts() == antes, f"quedó basura: {_counts()} != {antes}"
+print("9b ok  transacción real -> el bloqueo del honeypot tampoco queda a medias")
+
 print("\nTODAS LAS PRUEBAS PASARON")
