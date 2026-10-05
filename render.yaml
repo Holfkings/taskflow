@@ -1,0 +1,12 @@
+# TaskFlow en un solo origen: landing + API de leads.
+# Render Web Service (no Pages): el form y la pagina viven en el mismo host,
+# asi que no hay CORS ni cold start entre origenes.
+#
+#   gunicorn --chdir backend app:app
+#
+# Variables de entorno en Render (Dashboard > Environment):
+#   TASKFLOW_DB=/var/data/leads.db      # disco persistente, no /tmp
+#   IP_SALT=<string aleatorio largo>     # sin esto, los hashes de IP son predecibles
+#   LEAD_RATE_LIMIT=10                  # submits por IP por hora
+#   STATS_TOKEN=<secreto>               # habilita GET /api/stats
+web: gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2 --access-logfile -

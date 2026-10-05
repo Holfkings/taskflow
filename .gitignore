@@ -1,0 +1,21 @@
+# Base de datos local de leads (puede contener emails reales: NUNCA versionar)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Entorno
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Sistema
+.DS_Store
+Thumbs.db
