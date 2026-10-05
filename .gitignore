@@ -1,8 +1,13 @@
 # Base de datos local de leads (puede contener emails reales: NUNCA versionar)
+# OJO: los sidecars de WAL tambien llevan los datos dentro (verificado: un
+# leads.db-wal tras un crash contiene los emails en crudo), asi que el patron
+# tiene que cubrir los sufijos, no solo la extension.
 *.db
-*.db-journal
+*.db-*
 *.sqlite
+*.sqlite-*
 *.sqlite3
+*.sqlite3-*
 
 # Entorno
 .env
